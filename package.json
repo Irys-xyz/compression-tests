@@ -1,0 +1,23 @@
+{
+  "name": "compression-tests",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bundlr-Network/compression-tests.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Bundlr-Network/compression-tests/issues"
+  },
+  "homepage": "https://github.com/Bundlr-Network/compression-tests#readme",
+  "description": "",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "fs": "^0.0.1-security",
+    "xz": "^2.0.2"
+  }
+}
