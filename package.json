@@ -17,6 +17,7 @@
     "start": "node index.js"
   },
   "dependencies": {
+    "compressing": "^1.6.2",
     "fs": "^0.0.1-security",
     "xz": "^2.0.2"
   }
