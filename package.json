@@ -14,8 +14,9 @@
   "homepage": "https://github.com/Bundlr-Network/compression-tests#readme",
   "description": "",
   "scripts": {
-    "start": "node index.js",
-    "getBundles": "node getRandomBundles.js"
+    "compress:test": "node compressTestBundles.js",
+    "compress:random": "node compressRandomBundles.js",
+    "download:random": "node getRandomBundles.js"
   },
   "dependencies": {
     "compressing": "^1.6.2",
