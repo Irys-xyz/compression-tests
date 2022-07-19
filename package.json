@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "compressing": "^1.6.2",
+    "compressjs": "^1.0.3",
     "fs": "^0.0.1-security",
     "request": "^2.88.2",
     "xz": "^2.0.2"
