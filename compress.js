@@ -27,7 +27,7 @@ function compressFs(compression, path, method) {
       var endTime = performance.now();
       var fmtOldSize = formatSize(oldSize);
       var fmtNewSize = formatSize(newSize);
-      console.log(`${method}:\t| file ${path} \t| executed ${endTime - startTime} ms \t\t| previous size ${fmtOldSize} \t| new size ${fmtNewSize}`);
+      console.log(`${method}:\t| file ${path} \t| executed ${endTime - startTime} ms \t\t| ${oldSize} (${fmtOldSize}) => ${newSize} (${fmtNewSize})`);
 
   });
 }
@@ -40,7 +40,7 @@ function compress(compressFile, path, method) {
     var endTime = performance.now();
     var fmtOldSize = formatSize(oldSize);
     var fmtNewSize = formatSize(newSize);
-    console.log(`${method}:\t| file ${path} \t| executed ${endTime - startTime} ms \t\t| previous size ${fmtOldSize} \t| new size ${fmtNewSize}`);
+    console.log(`${method}:\t| file ${path} \t| executed ${endTime - startTime} ms \t\t| ${oldSize} (${fmtOldSize}) => ${newSize} (${fmtNewSize})`);
   };
   var handleError = (err) => console.error("Error compressing: ", err);
   var newPath = path + ".compressed." + method;
