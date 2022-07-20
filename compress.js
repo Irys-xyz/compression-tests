@@ -14,17 +14,26 @@ function formatSize(bytes) {
   return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
 }
 
-var compressDone = (method, path, startTime, oldSize) => {
+var compressDone = (method, path, newPath, startTime, oldSize) => {
   var newSize = getFilesizeInBytes(newPath);
   var endTime = performance.now();
   var fmtOldSize = formatSize(oldSize);
   var fmtNewSize = formatSize(newSize);
   console.log(`${method}:\t| file ${path} \t| executed ${endTime - startTime} ms \t\t| ${oldSize} (${fmtOldSize}) => ${newSize} (${fmtNewSize})`);
+  return {
+    algorithm: method,
+    file: path,
+    oldSize,
+    newSize,
+    ratio: newSize / oldSize * 100,
+    time: endTime - startTime,
+    format: fmtOldSize + ' => ' + fmtNewSize
+  }
 };
 
 var handleError = (err) => console.error("Error compressing: ", err);
 
-function compressXz(compression, path, method) {
+async function compressXz(compression, path, method) {
   var startTime = performance.now();
   var oldSize = getFilesizeInBytes(path);
   var newPath = path + ".compressed." + method;
@@ -32,25 +41,23 @@ function compressXz(compression, path, method) {
   var inFile = fs.createReadStream(path);
   var outFile = fs.createWriteStream(newPath);
   
-  var stream = inFile.pipe(compression).pipe(outFile);
-  stream.on('finish', () =>{
-      var newSize = getFilesizeInBytes(newPath);
-      var endTime = performance.now();
-      var fmtOldSize = formatSize(oldSize);
-      var fmtNewSize = formatSize(newSize);
-      console.log(`${method}:\t| file ${path} \t| executed ${endTime - startTime} ms \t\t| ${oldSize} (${fmtOldSize}) => ${newSize} (${fmtNewSize})`);
-
-  });
+  return new Promise((res) => {
+    var stream = inFile.pipe(compression).pipe(outFile);
+    stream.on('finish', () => {
+      var data = compressDone(method, path, newPath, startTime, oldSize);
+      res(data);
+    });
+  })
 }
 
-function compressCompressing(compressFile, path, method) {
+async function compressCompressing(compressFile, path, method) {
   var startTime = performance.now()
   var oldSize = getFilesizeInBytes(path);
   
   var newPath = path + ".compressed." + method;
   fs.closeSync(fs.openSync(newPath, 'w'));
-  compressFile(path, newPath)
-    .then(() => compressDone(method, path, startTime, oldSize))
+  return compressFile(path, newPath)
+    .then(() => compressDone(method, path, newPath, startTime, oldSize))
     .catch(handleError);
 }
 
@@ -68,22 +75,24 @@ function compressCompressJs(algorithm, path, method) {
     resolve();
   });
 
-  compressFile()
-    .then(() => compressDone(method, path, startTime, oldSize))
+  return compressFile()
+    .then(() => compressDone(method, path, newPath, startTime, oldSize))
     .catch(handleError)
 }
 
-function compress(compress, path, method) {
-  console.log('compressing ', path, ' with ', method);
+async function compress(compress, path, method) {
+  let data = {};
+  console.log('Compressing ' + path + ' ' + method);
   if(method === 'lzma2') {
-    compressXz(compress, path, method);
+    data = compressXz(compress, path, method);
   } else if (['tgz', 'zip', 'gzip'].indexOf(method) > -1) {
     var alg = compress[method].compressFile;
-    compressCompressing(alg, path, method);
+    data = compressCompressing(alg, path, method);
   } else {
     var alg = compress[method];
-    compressCompressJs(alg, path, method);
+    data = compressCompressJs(alg, path, method);
   }
+  return data;
 }
 
 
